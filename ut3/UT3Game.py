@@ -4,6 +4,7 @@ sys.path.append('..')
 from Game import Game
 from .UT3Logic import Board
 import numpy as np
+import colorama
 
 class UT3Game(Game):
     def __init__(self, n=3):
@@ -91,5 +92,5 @@ def display(board, indent='  '):
                 sep = '==========='
                 print(indent + '= ' + sep + '#' + sep + '#' + sep)
         row = ' ‖ '.join(' | '.join(map(str, map(int, row[i:i+3]))) for i in range(0, len(row), 3))
-        print(indent + str(n) + '  ' + row.replace('-1','O').replace('1','X').replace('0','.'))
+        print(Back.YELLOW + indent + str(n) + '  ' + row.replace('-1','O').replace('1','X').replace('0','.'))
     print('')
