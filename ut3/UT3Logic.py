@@ -11,8 +11,12 @@ Pieces board data:
 from itertools import product
 import numpy as np
 
+
+BOARD_SIZE = 3  # Controls the size of the UT3 board
+
+
 class Board:
-    def __init__(self, n=3):
+    def __init__(self, n=BOARD_SIZE):
         # Create empty macro and board arrays
         self.n = n
         self.macro = np.zeros((self.n, self.n))
@@ -37,23 +41,29 @@ class Board:
 
     def is_full(self, board=None):
         """Check whether a board is full."""
-        if board is None: board = self.macro
+        if board is None:
+            board = self.macro
         return board.all()
 
     def is_win(self, player, board=None):
         """Check whether a given player has a line in any direction."""
-        if board is None: board = self.macro
+        if board is None:
+            board = self.macro
         for i in range(len(board)):
-            if (board[i,:] == player).all(): return True
-            if (board[:,i] == player).all(): return True
-        if (board.diagonal() == player).all(): return True
-        if (board[::-1].diagonal() == player).all(): return True
+            if (board[i, :] == player).all():
+                return True
+            if (board[:, i] == player).all():
+                return True
+        if (board.diagonal() == player).all():
+            return True
+        if (board[::-1].diagonal() == player).all():
+            return True
         return False
 
     def execute_move(self, move, player):
         """Place a piece on the board and update the macro."""
         _u = tuple(int(i/self.n) for i in move)
-        _v = tuple(int(i%self.n) for i in move)
+        _v = tuple(int(i % self.n) for i in move)
         assert self.pieces[move] == 0
         self.pieces[move] = player
         uboard = self.get_microboard(_u)

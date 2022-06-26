@@ -14,13 +14,13 @@ args = dotdict({
     'cpuct': 2,
 
     'checkpoint': './temp/',
-    'load_model': True,
-    'load_folder_file': ('./temp/','temp.pth.tar'),
+    'load_model': False,
+    'load_folder_file': ('./temp/', 'temp.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
 
-if __name__=="__main__":
+if __name__ == "__main__":
     g = Game()
     nnet = nn(g)
 
