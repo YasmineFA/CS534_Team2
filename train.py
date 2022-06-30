@@ -4,7 +4,7 @@ from ut3.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 1000,
+    'numIters': 10,
     'numEps': 100,
     'tempThreshold': 15,
     'updateThreshold': 0.52,
@@ -14,7 +14,7 @@ args = dotdict({
     'cpuct': 2,
 
     'checkpoint': './temp/',
-    'load_model': True,
+    'load_model': False,
     'load_folder_file': ('./temp/','temp.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
