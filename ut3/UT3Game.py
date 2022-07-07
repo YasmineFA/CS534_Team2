@@ -98,9 +98,6 @@ def display(board, indent='  '):
                 ending = "‖"
             if(i==len(row)-1):
                 ending = ""
-            # if(Board.is_win(1, Board.get_microboard(self=Board, index=row))):
-            #     print(str(row[i]).replace('-1.0', colorama.Back.YELLOW + 'O').replace('1.0', colorama.Back.YELLOW +'X').replace('0.0', colorama.Back.YELLOW + '.'), end=colorama.Back.RESET + ending)
-            
             print(str(row[i]).replace('-1.0', colorama.Back.YELLOW + ' O ').replace('1.0', colorama.Back.BLUE +' X ').replace('0.0', colorama.Back.RESET + ' . '), end=colorama.Back.RESET + ending)
         print(colorama.Style.RESET_ALL)
     print('')
