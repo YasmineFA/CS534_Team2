@@ -17,14 +17,15 @@ class UT3NNet(nn.Module):
         self.relu, self.tanh = nn.ReLU(), nn.Tanh()
         self.soft = nn.LogSoftmax(dim=1)
 
-        self.conv0 = nn.Conv2d(self.channels, args.width, BOARD_SIZE, 1, 1)
+        self.conv0 = nn.Conv2d(self.channels, args.width, 3, 1, 1)
+        # print("kernel size", self.conv0.kernel_size)
 
         self.conv1 = nn.Conv2d(self.channels + args.width, args.width,
-                               kernel_size=(BOARD_SIZE, BOARD_SIZE), stride=3)
+                               kernel_size=(BOARD_SIZE, BOARD_SIZE), stride=BOARD_SIZE)
         self.conv2 = nn.Conv2d(self.channels + args.width, BOARD_SIZE*args.width,
-                               kernel_size=(BOARD_SIZE, (BOARD_SIZE**2)), stride=3)
+                               kernel_size=(BOARD_SIZE, (BOARD_SIZE**2)), stride=BOARD_SIZE)
         self.conv3 = nn.Conv2d(self.channels + args.width, BOARD_SIZE*args.width,
-                               kernel_size=((BOARD_SIZE**2), BOARD_SIZE), stride=3)
+                               kernel_size=((BOARD_SIZE**2), BOARD_SIZE), stride=BOARD_SIZE)
         self.conv4 = nn.Conv2d(self.channels + args.width, (BOARD_SIZE**2)*args.width,
                                kernel_size=((BOARD_SIZE**2), (BOARD_SIZE**2)))
 
@@ -33,7 +34,8 @@ class UT3NNet(nn.Module):
 
     def forward(self, x):
         y = self.conv0(x)
-        print(y[0][0][0])
+        # print(len(x[0][0]))
+        # print(len(y[0][0]), y[0][0])
         x = torch.cat((x, y), dim=1)
         x1 = self.conv1(x).view(-1, (BOARD_SIZE**2)*self.args.width)
         x2 = self.conv2(x).view(-1, (BOARD_SIZE**2)*self.args.width)

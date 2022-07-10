@@ -28,12 +28,12 @@ mcts1 = MCTS(g, n1, args1)
 def np1(x): return np.argmax(mcts1.getActionProb(x, temp=0))
 
 
-n2 = NNet(g)
-n2.load_checkpoint('./temp/', 'best.pth.tar')
-args2 = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
-mcts2 = MCTS(g, n2, args2)
-def np2(x): return np.argmax(mcts2.getActionProb(x, temp=0))
+# n2 = NNet(g)
+# n2.load_checkpoint('./temp/', 'best.pth.tar')
+# args2 = dotdict({'numMCTSSims': 25, 'cpuct': 1.0})
+# mcts2 = MCTS(g, n2, args2)
+# def np2(x): return np.argmax(mcts2.getActionProb(x, temp=0))
 
 
-arena = Arena.Arena(rp, hp, g, display=display)
+arena = Arena.Arena(np1, hp, g, display=display)
 print(arena.playGames(100, verbose=True))

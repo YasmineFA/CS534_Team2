@@ -12,7 +12,7 @@ from itertools import product
 import numpy as np
 
 
-BOARD_SIZE = 3  # Controls the size of the UT3 board
+BOARD_SIZE = 4  # Controls the size of the UT3 board
 
 
 class Board:
