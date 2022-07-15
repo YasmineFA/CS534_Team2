@@ -4,10 +4,12 @@ import time
 
 numPlayers = 3
 
+
 class Arena():
     """
     An Arena class where any 2 agents can be pit against each other.
     """
+
     def __init__(self, players, game, display=None):
         """
         Input:
@@ -23,16 +25,15 @@ class Arena():
         self.players = players
         self.game = game
         self.display = display
-        
+
     def getNextPlayer(self, players, player):
-    	nextPlayer = players[0]
- 
-    	if player >= numPlayers:
-    		return nextPlayer 
-    	else:
-    		nextPlayer = players[player]
-    		return nextPlayer
-    	
+        nextPlayer = players[0]
+
+        if player >= numPlayers:
+            return nextPlayer
+        else:
+            nextPlayer = players[player]
+            return nextPlayer
 
     def playGame(self, verbose=False):
         """
@@ -45,30 +46,33 @@ class Arena():
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
         players = self.players
-        
+
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
-        while self.game.getGameEnded(board, curPlayer)==0:
-            it+=1
+        while self.game.getGameEnded(board, curPlayer) == 0:
+            it += 1
             if verbose:
                 assert(self.display)
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
-            
-            action = self.getNextPlayer(players, curPlayer)(self.game.getCanonicalForm(board, curPlayer))
-            
-            valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer),1)
 
-            if valids[action]==0:
+            action = self.getNextPlayer(players, curPlayer)(
+                self.game.getCanonicalForm(board, curPlayer))
+
+            valids = self.game.getValidMoves(
+                self.game.getCanonicalForm(board, curPlayer), 1)
+
+            if valids[action] == 0:
                 print(action)
-                assert valids[action] >0
+                assert valids[action] > 0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
         if verbose:
             assert(self.display)
-            print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
+            print("Game over: Turn ", str(it), "Result ",
+                  str(self.game.getGameEnded(board, 1)))
             self.display(board)
-        #print(board)
+        # print(board)
         return self.game.getGameEnded(board, 1)
 
     def playGames(self, num, verbose=False):
@@ -92,19 +96,19 @@ class Arena():
         draws = 0
         for _ in range(num):
             gameResult = self.playGame(verbose=verbose)
-            if gameResult==1:
-            	playerWins[0] +=1
-            elif gameResult==2:
-            	playerWins[1] +=1
-            elif gameResult==3:
-            	playerWins[2]+=1
+            if gameResult == 1:
+                playerWins[0] += 1
+            elif gameResult == 2:
+                playerWins[1] += 1
+            elif gameResult == 3:
+                playerWins[2] += 1
             else:
-                draws+=1
+                draws += 1
             # bookkeeping + plot progress
             eps += 1
             eps_time.update(time.time() - end)
             end = time.time()
-            bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
                                                                                                        total=bar.elapsed_td, eta=bar.eta_td)
             bar.next()
 
@@ -112,19 +116,19 @@ class Arena():
 
         for _ in range(num):
             gameResult = self.playGame(verbose=verbose)
-            if gameResult==2:
-                playerWins[0]+=1
-            elif gameResult==1:
-                playerWins[1]+=1
-            elif gameResult==3:
-                playerWins[2]+=1
+            if gameResult == 2:
+                playerWins[0] += 1
+            elif gameResult == 1:
+                playerWins[1] += 1
+            elif gameResult == 3:
+                playerWins[2] += 1
             else:
-                draws+=1
+                draws += 1
             # bookkeeping + plot progress
             eps += 1
             eps_time.update(time.time() - end)
             end = time.time()
-            bar.suffix  = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
                                                                                                        total=bar.elapsed_td, eta=bar.eta_td)
             bar.next()
 
