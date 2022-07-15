@@ -9,10 +9,13 @@ Pieces board data:
 '''
 
 from itertools import product
+from Arena import numPlayers
 import numpy as np
 
+b_sz = 4
+
 class Board:
-    def __init__(self, n=3):
+    def __init__(self, n=b_sz):
         # Create empty macro and board arrays
         self.n = n
         self.macro = np.zeros((self.n, self.n))
@@ -24,6 +27,16 @@ class Board:
 
     def get_microboard(self, index):
         return self[tuple(slice(self.n*i, self.n*(i+1)) for i in index)]
+        
+    def getInnerBoards(self, bboard):    	
+    	boards = []
+    	
+    	for i in range(b_sz-2):
+    		for j in range(b_sz-2):
+    			miniboard = np.array(bboard[i:i+3, j:j+3])
+    			
+    			boards.append(miniboard)
+    	return boards
 
     def get_legal_moves(self, player):
         """Returns all legal moves for a given player."""
@@ -57,13 +70,15 @@ class Board:
         assert self.pieces[move] == 0
         self.pieces[move] = player
         uboard = self.get_microboard(_u)
+        insides = self.getInnerBoards(uboard)
 
         if self.is_full(uboard):
             self.macro[_u] = self.draw
 
-        for player in -1, 1:
-            if self.is_win(player, uboard):
-                self.macro[_u] = player
+        for player in range(1, numPlayers+1):
+            for b in insides:
+                if self.is_win(player, b):
+                	self.macro[_u] = player
 
         for u in product(range(self.n), range(self.n)):
             if not self.macro[u]:

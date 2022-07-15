@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from Arena import numPlayers
 EPS = 1e-8
 
 class MCTS():
@@ -62,8 +63,10 @@ class MCTS():
         Returns:
             v: the negative of the value of the current canonicalBoard
         """
-
+        #canonicalBoard %= (numPlayers)
+        #canonicalBoard %= numPlayers+1
         s = self.game.stringRepresentation(canonicalBoard)
+        #print(canonicalBoard)
 
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
@@ -75,10 +78,13 @@ class MCTS():
             # leaf node
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
             valids = self.game.getValidMoves(canonicalBoard, 1)
+            #print(valids)
+            #print(canonicalBoard)
             self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
             if sum_Ps_s > 0:
                 self.Ps[s] /= sum_Ps_s    # renormalize
+                #print(canonicalBoard)
             else:
                 # if all valid moves were masked make all valid moves equally probable
                 print(canonicalBoard)
@@ -87,9 +93,11 @@ class MCTS():
                 print("All valid moves were masked, do workaround.")
                 self.Ps[s] = self.Ps[s] + valids
                 self.Ps[s] /= np.sum(self.Ps[s])
+                #print(v)
 
             self.Vs[s] = valids
             self.Ns[s] = 0
+            
             return -v
 
         valids = self.Vs[s]
