@@ -12,9 +12,9 @@ from NeuralNet import NeuralNet
 from .UT3NNet import UT3NNet as onnet
 
 args = dotdict({
-    'lr': 0.0001,
+    'lr': 0.001,
     'dropout': 0.5,
-    'epochs': 10,
+    'epochs': 3,
     'batch_size': 64,
     'cuda': torch.cuda.is_available(),
     'width': 64,
