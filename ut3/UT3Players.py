@@ -1,4 +1,5 @@
 import random
+from Arena import numPlayers
 
 class RandomPlayer():
     def __init__(self, game):
@@ -48,10 +49,10 @@ class MinMaxUT3Player():
             self.valid[key] = [a for a, val in enumerate(self.game.getValidMoves(board, 1)) if val]
 
         if self.end[key]:
-            return -self.end[key], None
+            return (self.end[key]%numPlayers)+1, None
 
         if depth == 0:
-            return -self.end[key], random.choice(self.valid[key])
+            return (self.end[key]%numPlayers)+1, random.choice(self.valid[key])
 
         value_action = []
 
@@ -63,20 +64,20 @@ class MinMaxUT3Player():
         wins = [(v, a) for v, a in value_action if v == 1]
         if len(wins):
             value, action = random.choice(wins)
-            return -value, action
+            return (value%numPlayers)+1, action
 
         unknowns = [(v, a) for v, a in value_action if v == 0]
         if len(unknowns):
             value, action = random.choice(unknowns)
-            return -value, action
+            return (value%numPlayers)+1, action
 
         draws = [(v, a) for v, a in value_action if v > -1]
         if len(draws):
             value, action = random.choice(draws)
-            return -value, action
+            return (value%numPlayers)+1, action
 
         value, action = random.choice(value_action)
-        return -value, action
+        return (value%numPlayers)+1, action
 
     def play(self, board):
         return self.search(board, self.depth)[1]
