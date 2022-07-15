@@ -14,6 +14,7 @@ import numpy as np
 
 b_sz = 4
 
+
 class Board:
     def __init__(self, n=b_sz):
         # Create empty macro and board arrays
@@ -27,16 +28,16 @@ class Board:
 
     def get_microboard(self, index):
         return self[tuple(slice(self.n*i, self.n*(i+1)) for i in index)]
-        
-    def getInnerBoards(self, bboard):    	
-    	boards = []
-    	
-    	for i in range(b_sz-2):
-    		for j in range(b_sz-2):
-    			miniboard = np.array(bboard[i:i+3, j:j+3])
-    			
-    			boards.append(miniboard)
-    	return boards
+
+    def getInnerBoards(self, bboard):
+        boards = []
+
+        for i in range(b_sz-2):
+            for j in range(b_sz-2):
+                miniboard = np.array(bboard[i:i+3, j:j+3])
+
+                boards.append(miniboard)
+        return boards
 
     def get_legal_moves(self, player):
         """Returns all legal moves for a given player."""
@@ -50,23 +51,29 @@ class Board:
 
     def is_full(self, board=None):
         """Check whether a board is full."""
-        if board is None: board = self.macro
+        if board is None:
+            board = self.macro
         return board.all()
 
     def is_win(self, player, board=None):
         """Check whether a given player has a line in any direction."""
-        if board is None: board = self.macro
+        if board is None:
+            board = self.macro
         for i in range(len(board)):
-            if (board[i,:] == player).all(): return True
-            if (board[:,i] == player).all(): return True
-        if (board.diagonal() == player).all(): return True
-        if (board[::-1].diagonal() == player).all(): return True
+            if (board[i, :] == player).all():
+                return True
+            if (board[:, i] == player).all():
+                return True
+        if (board.diagonal() == player).all():
+            return True
+        if (board[::-1].diagonal() == player).all():
+            return True
         return False
 
     def execute_move(self, move, player):
         """Place a piece on the board and update the macro."""
         _u = tuple(int(i/self.n) for i in move)
-        _v = tuple(int(i%self.n) for i in move)
+        _v = tuple(int(i % self.n) for i in move)
         assert self.pieces[move] == 0
         self.pieces[move] = player
         uboard = self.get_microboard(_u)
@@ -78,7 +85,7 @@ class Board:
         for player in range(1, numPlayers+1):
             for b in insides:
                 if self.is_win(player, b):
-                	self.macro[_u] = player
+                    self.macro[_u] = player
 
         for u in product(range(self.n), range(self.n)):
             if not self.macro[u]:
