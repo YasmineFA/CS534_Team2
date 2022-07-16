@@ -1,6 +1,7 @@
 import random
 from Arena import numPlayers
 
+
 class RandomPlayer():
     def __init__(self, game):
         self.game = game
@@ -9,7 +10,8 @@ class RandomPlayer():
         valid = self.game.getValidMoves(board, 1)
         while True:
             a = random.randrange(self.game.getActionSize())
-            if valid[a]: return a
+            if valid[a]:
+                return a
 
 
 class HumanUT3Player():
@@ -19,8 +21,8 @@ class HumanUT3Player():
     def play(self, board):
         valid = self.game.getValidMoves(board, 1)
         print('Valid moves:')
-        print(', '.join(str(int(i/self.game.n**2))+' '+str(int(i%self.game.n**2))
-            for i, v in enumerate(valid) if v))
+        print(', '.join(str(int(i/self.game.n**2))+' '+str(int(i % self.game.n**2))
+                        for i, v in enumerate(valid) if v))
         while True:
             a = input()
             x, y = [int(x) for x in a.split(' ')]
@@ -46,13 +48,16 @@ class MinMaxUT3Player():
             self.end[key] = self.game.getGameEnded(board, 1)
 
         if key not in self.valid:
-            self.valid[key] = [a for a, val in enumerate(self.game.getValidMoves(board, 1)) if val]
+            self.valid[key] = [a for a, val in enumerate(
+                self.game.getValidMoves(board, 1)) if val]
 
         if self.end[key]:
-            return (self.end[key]%numPlayers)+1, None
+            return (self.end[key] % numPlayers)+1, None
 
         if depth == 0:
-            return (self.end[key]%numPlayers)+1, random.choice(self.valid[key])
+            if self.end[key] == 0 or self.end[key] < 1:
+                return self.end[key], random.choice(self.valid[key])
+            return (self.end[key] % numPlayers)+1, random.choice(self.valid[key])
 
         value_action = []
 
@@ -64,20 +69,20 @@ class MinMaxUT3Player():
         wins = [(v, a) for v, a in value_action if v == 1]
         if len(wins):
             value, action = random.choice(wins)
-            return (value%numPlayers)+1, action
+            return (value % numPlayers)+1, action
 
         unknowns = [(v, a) for v, a in value_action if v == 0]
         if len(unknowns):
             value, action = random.choice(unknowns)
-            return (value%numPlayers)+1, action
+            return value, action
 
-        draws = [(v, a) for v, a in value_action if v > -1]
+        draws = [(v, a) for v, a in value_action if v < 1]
         if len(draws):
             value, action = random.choice(draws)
-            return (value%numPlayers)+1, action
+            return value, action
 
         value, action = random.choice(value_action)
-        return (value%numPlayers)+1, action
+        return (value % numPlayers)+1, action
 
     def play(self, board):
         return self.search(board, self.depth)[1]
