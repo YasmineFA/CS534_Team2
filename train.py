@@ -5,22 +5,22 @@ from utils import *
 
 args = dotdict({
     'numIters': 10,
-    'numEps': 10,
+    'numEps': 1,
     'tempThreshold': 15,
-    'updateThreshold': 0.52,
+    'updateThreshold': 0.34,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 10,
-    'arenaCompare': 30,
+    'numMCTSSims': 20,
+    'arenaCompare': 3,
     'cpuct': 2,
 
     'checkpoint': './temp/',
     'load_model': False,
-    'load_folder_file': ('./temp/','temp.pth.tar'),
+    'load_folder_file': ('./temp/', 'temp.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 
 })
 
-if __name__=="__main__":
+if __name__ == "__main__":
     g = Game()
     nnet = nn(g)
 

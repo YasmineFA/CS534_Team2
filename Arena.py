@@ -2,7 +2,7 @@ import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time
 
-numPlayers = 3
+numPlayers = 2
 
 
 class Arena():
@@ -91,46 +91,50 @@ class Arena():
         eps = 0
         maxeps = int(num)
 
-        num = int(num/2)
         playerWins = [0]*numPlayers
+
         draws = 0
-        for _ in range(num):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == 1:
-                playerWins[0] += 1
-            elif gameResult == 2:
-                playerWins[1] += 1
-            elif gameResult == 3:
-                playerWins[2] += 1
-            else:
-                draws += 1
-            # bookkeeping + plot progress
-            eps += 1
-            eps_time.update(time.time() - end)
-            end = time.time()
-            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
-                                                                                                       total=bar.elapsed_td, eta=bar.eta_td)
-            bar.next()
+        for offset in range(numPlayers):
 
-        self.players[0], self.players[1] = self.players[1], self.players[0]
+            # plays a set of games
+            for _ in range(int(num/numPlayers)):
+                gameResult = self.playGame(verbose=verbose)
+                if gameResult < 1 and gameResult > 0:
+                    draws += 1
+                else:
+                    playerWins[gameResult - offset - 1] += 1
 
-        for _ in range(num):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == 2:
-                playerWins[0] += 1
-            elif gameResult == 1:
-                playerWins[1] += 1
-            elif gameResult == 3:
-                playerWins[2] += 1
-            else:
-                draws += 1
-            # bookkeeping + plot progress
-            eps += 1
-            eps_time.update(time.time() - end)
-            end = time.time()
-            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
-                                                                                                       total=bar.elapsed_td, eta=bar.eta_td)
-            bar.next()
+                    # bookkeeping + plot progress
+                eps += 1
+                eps_time.update(time.time() - end)
+                end = time.time()
+                bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+                                                                                                           total=bar.elapsed_td, eta=bar.eta_td)
+                bar.next()
+
+            # swaps player order
+            temp = self.players[0]
+            for i in range(len(self.players) - 1):
+                self.players[i] = self.players[i+1]
+            self.players[-1] = temp
+
+            # for _ in range(num):
+            #     gameResult = self.playGame(verbose=verbose)
+            #     if gameResult == 2:
+            #         playerWins[0] += 1
+            #     elif gameResult == 1:
+            #         playerWins[1] += 1
+            #     elif gameResult == 3:
+            #         playerWins[2] += 1
+            #     else:
+            #         draws += 1
+            #     # bookkeeping + plot progress
+            #     eps += 1
+            #     eps_time.update(time.time() - end)
+            #     end = time.time()
+            #     bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+            #                                                                                                total=bar.elapsed_td, eta=bar.eta_td)
+            #     bar.next()
 
         bar.finish()
 
