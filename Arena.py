@@ -24,25 +24,6 @@ class Arena():
         self.players = players
         self.game = game
         self.display = display
-        #self.assignPositions(self.players)
-        
-    def assignPositions(self, players):
-    	for x in players:
-    		from ut3.UT3Players import MinMaxUT3Player
-    		
-    		if isinstance(x, type(MinMaxUT3Player(self.game).play)):
-    			print('Found MinMaxPlayer')
-    			#x.__self__.pos = (players.index(x)+numPlayers)%numPlayers
-    			#x.__self__.active = (players.index(x)+numPlayers)%numPlayers
-
-    def getNextPlayer(self, players, player):
-        nextPlayer = players[0]
-
-        if player >= numPlayers:
-            return nextPlayer
-        else:
-            nextPlayer = players[player]
-            return nextPlayer
 
     def playGame(self, verbose=False):
         """
@@ -64,10 +45,10 @@ class Arena():
             it += 1
             if verbose:
                 assert(self.display)
-                print("Turn ", str(it), "Player ", str(curPlayer))
-                self.display(board)
+                #print("Turn ", str(it), "Player ", str(curPlayer))
+                #self.display(board)
 
-            action = self.getNextPlayer(players, curPlayer)(
+            action = players[curPlayer-1](
                 self.game.getCanonicalForm(board, curPlayer))
 
             valids = self.game.getValidMoves(

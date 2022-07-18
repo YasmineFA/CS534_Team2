@@ -47,7 +47,7 @@ class MinMaxUT3Player():
         self.valid = {}
         self.draw = np.finfo(float).eps
 
-    def search(self, board, depth, curPlayer):
+    def search(self, board, depth):
         key = self.game.stringRepresentation(board)
 
         if key not in self.end:

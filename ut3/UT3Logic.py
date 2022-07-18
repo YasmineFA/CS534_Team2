@@ -12,7 +12,7 @@ from itertools import product
 from Arena import numPlayers
 import numpy as np
 
-b_sz = 3
+b_sz = 4
 
 
 class Board:
