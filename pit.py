@@ -18,8 +18,9 @@ g = UT3Game()
 rp1 = RandomPlayer(g).play
 rp2 = RandomPlayer(g).play
 hp = HumanUT3Player(g).play
-mp1 = MinMaxUT3Player(g, 1).play
+mp1 = MinMaxUT3Player(g, 0).play
 mp2 = MinMaxUT3Player(g, 3).play
+mcp = MCTSUT3Player(g, args=dotdict({'numMCTSSims': 100, 'cpuct': 2})).play
 
 # nnet players
 n1 = NNet(g)
@@ -36,6 +37,7 @@ mcts2 = MCTS(g, n2, args2)
 def np2(x): return np.argmax(mcts2.getActionProb(x, temp=0))
 
 
-# player order: player 1, player 2, player 3
-arena = Arena.Arena([rp1, rp2, np1], g, display=display)
-print(arena.playGames(12, verbose=False))
+
+arena = Arena.Arena([np1, mp1], g, display=display)
+
+print(arena.playGames(12, verbose=True))

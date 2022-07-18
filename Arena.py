@@ -4,7 +4,6 @@ import time
 
 numPlayers = 3
 
-
 class Arena():
     """
     An Arena class where any 2 agents can be pit against each other.
@@ -26,16 +25,6 @@ class Arena():
         self.game = game
         self.display = display
 
-    def getNextPlayer(self, players, player):
-        return players[player-1]
-        # nextPlayer = players[0]
-
-        # if player >= numPlayers:
-        #     return nextPlayer
-        # else:
-        #     nextPlayer = players[player]
-        #     return nextPlayer
-
     def playGame(self, verbose=False):
         """
         Executes one episode of a game.
@@ -51,14 +40,15 @@ class Arena():
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
+        
         while self.game.getGameEnded(board, curPlayer) == 0:
             it += 1
             if verbose:
                 assert(self.display)
-                print("Turn ", str(it), "Player ", str(curPlayer))
-                self.display(board)
+                #print("Turn ", str(it), "Player ", str(curPlayer))
+                #self.display(board)
 
-            action = self.getNextPlayer(players, curPlayer)(
+            action = players[curPlayer-1](
                 self.game.getCanonicalForm(board, curPlayer))
 
             valids = self.game.getValidMoves(
@@ -95,6 +85,46 @@ class Arena():
         playerWins = [0]*numPlayers
 
         draws = 0
+
+        '''for _ in range(num):
+            gameResult = self.playGame(verbose=verbose)
+            if gameResult == 1:
+                playerWins[0] += 1
+            elif gameResult == 2:
+                playerWins[1] += 1
+            elif gameResult == 3:
+                playerWins[2] += 1
+            else:
+                draws += 1
+            # bookkeeping + plot progress
+            eps += 1
+            eps_time.update(time.time() - end)
+            end = time.time()
+            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+                                                                                                       total=bar.elapsed_td, eta=bar.eta_td)
+            bar.next()
+
+        self.players[0], self.players[1] = self.players[1], self.players[0]
+        #self.assignPositions(self.players)
+
+        for _ in range(num):
+            gameResult = self.playGame(verbose=verbose)
+            if gameResult == 2:
+                playerWins[0] += 1
+            elif gameResult == 1:
+                playerWins[1] += 1
+            elif gameResult == 3:
+                playerWins[2] += 1
+            else:
+                draws += 1
+            # bookkeeping + plot progress
+            eps += 1
+            eps_time.update(time.time() - end)
+            end = time.time()
+            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps, maxeps=maxeps, et=eps_time.avg,
+                                                                                                       total=bar.elapsed_td, eta=bar.eta_td)
+            bar.next()'''
+
         for offset in range(numPlayers):
             # plays a set of games
             for _ in range(int(num/numPlayers)):
