@@ -6,6 +6,7 @@ EPS = 1e-8
 
 from Arena import numPlayers
 
+
 class RandomPlayer():
     def __init__(self, game):
         self.game = game
@@ -46,7 +47,7 @@ class MinMaxUT3Player():
         self.valid = {}
         self.draw = np.finfo(float).eps
 
-    def search(self, board, depth):
+    def search(self, board, depth, curPlayer):
         key = self.game.stringRepresentation(board)
 
         if key not in self.end:
@@ -64,7 +65,8 @@ class MinMaxUT3Player():
                 	self.end[key][i] = 0
 
         if key not in self.valid:
-            self.valid[key] = [a for a, val in enumerate(self.game.getValidMoves(board, 1)) if val]
+            self.valid[key] = [a for a, val in enumerate(
+                self.game.getValidMoves(board, 1)) if val]
 
         if any(self.end[key]):
         
@@ -82,13 +84,10 @@ class MinMaxUT3Player():
             next_board = self.game.getCanonicalForm(next_board, next_player)
             active_player = (active_player%numPlayers)+1
             value_action.append((self.search(next_board, depth-1)[0], a))
-            
-        #print(active_player)
 
         wins = [(v, a) for v, a in value_action if any(v == active_player)]
         if len(wins):
             value, action = random.choice(wins)
-            #print('Winning')
             return value, action
 
         unknowns = [(v, a) for v, a in value_action if all(v)]
@@ -103,7 +102,6 @@ class MinMaxUT3Player():
 
         value, action = random.choice(value_action)
         return value, action
-    
 	
     def play(self, board):
         temp = self.search(board, self.depth)
@@ -256,3 +254,4 @@ class MCTSUT3Player():
     def play(self, board):
     
         return self.getActionProb(board)
+

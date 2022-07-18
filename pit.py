@@ -39,3 +39,4 @@ def np1(x): return np.argmax(mcts1.getActionProb(x, temp=0))
 arena = Arena.Arena([mcp, mp1], g, display=display)
 
 print(arena.playGames(12, verbose=True))
+
