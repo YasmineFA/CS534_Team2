@@ -4,6 +4,7 @@ import time
 
 numPlayers = 3
 
+
 class Arena():
     """
     An Arena class where any 2 agents can be pit against each other.
@@ -40,13 +41,13 @@ class Arena():
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
-        
+
         while self.game.getGameEnded(board, curPlayer) == 0:
             it += 1
             if verbose:
                 assert(self.display)
                 #print("Turn ", str(it), "Player ", str(curPlayer))
-                #self.display(board)
+                # self.display(board)
 
             action = players[curPlayer-1](
                 self.game.getCanonicalForm(board, curPlayer))

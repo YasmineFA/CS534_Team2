@@ -1,15 +1,16 @@
 from Coach import Coach
+from Arena import numPlayers
 from ut3.UT3Game import UT3Game as Game
 from ut3.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 20,
-    'numEps': 10,
+    'numIters': 100,
+    'numEps': 20,
     'tempThreshold': 15,
-    'updateThreshold': 0.34,
+    'updateThreshold': 0.52 if numPlayers == 2 else 0.34,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 20,
+    'numMCTSSims': 10,
     'arenaCompare': 30,
     'cpuct': 2,
 
