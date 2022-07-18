@@ -15,7 +15,8 @@ any agent.
 g = UT3Game()
 
 # all players
-rp = RandomPlayer(g).play
+rp1 = RandomPlayer(g).play
+rp2 = RandomPlayer(g).play
 hp = HumanUT3Player(g).play
 mp1 = MinMaxUT3Player(g, 0).play
 mp2 = MinMaxUT3Player(g, 3).play
@@ -23,20 +24,20 @@ mcp = MCTSUT3Player(g, args=dotdict({'numMCTSSims': 100, 'cpuct': 2})).play
 
 # nnet players
 n1 = NNet(g)
-# n1.load_checkpoint('./temp/','best.pth.tar')
+n1.load_checkpoint('./temp/', 'best.pth.tar')
 args1 = dotdict({'numMCTSSims': 50, 'cpuct': 2})
 mcts1 = MCTS(g, n1, args1)
 def np1(x): return np.argmax(mcts1.getActionProb(x, temp=0))
 
-#n2 = NNet(g)
+
+n2 = NNet(g)
 # n2.load_checkpoint('/dev/8x50x25/','best.pth.tar')
-#args2 = dotdict({'numMCTSSims': 25, 'cpuct':1.0})
-#mcts2 = MCTS(g, n2, args2)
-#np2 = lambda x: np.argmax(mcts2.getActionProb(x, temp=0))
+args2 = dotdict({'numMCTSSims': 50, 'cpuct': 2})
+mcts2 = MCTS(g, n2, args2)
+def np2(x): return np.argmax(mcts2.getActionProb(x, temp=0))
 
 
-# player order: player 3, player 1, player 2
+
 arena = Arena.Arena([np1, mp1], g, display=display)
 
 print(arena.playGames(12, verbose=True))
-

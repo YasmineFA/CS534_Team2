@@ -4,13 +4,13 @@ from ut3.pytorch.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 10,
-    'numEps': 1,
+    'numIters': 20,
+    'numEps': 10,
     'tempThreshold': 15,
     'updateThreshold': 0.34,
     'maxlenOfQueue': 200000,
     'numMCTSSims': 20,
-    'arenaCompare': 3,
+    'arenaCompare': 30,
     'cpuct': 2,
 
     'checkpoint': './temp/',
