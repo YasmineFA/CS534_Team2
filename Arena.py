@@ -2,8 +2,7 @@ import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time
 
-numPlayers = 3
-
+numPlayers = 2
 
 class Arena():
     """
@@ -25,6 +24,16 @@ class Arena():
         self.players = players
         self.game = game
         self.display = display
+        #self.assignPositions(self.players)
+        
+    def assignPositions(self, players):
+    	for x in players:
+    		from ut3.UT3Players import MinMaxUT3Player
+    		
+    		if isinstance(x, type(MinMaxUT3Player(self.game).play)):
+    			print('Found MinMaxPlayer')
+    			#x.__self__.pos = (players.index(x)+numPlayers)%numPlayers
+    			#x.__self__.active = (players.index(x)+numPlayers)%numPlayers
 
     def getNextPlayer(self, players, player):
         nextPlayer = players[0]
@@ -50,6 +59,7 @@ class Arena():
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
+        
         while self.game.getGameEnded(board, curPlayer) == 0:
             it += 1
             if verbose:
@@ -113,6 +123,7 @@ class Arena():
             bar.next()
 
         self.players[0], self.players[1] = self.players[1], self.players[0]
+        #self.assignPositions(self.players)
 
         for _ in range(num):
             gameResult = self.playGame(verbose=verbose)

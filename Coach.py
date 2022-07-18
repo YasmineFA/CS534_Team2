@@ -60,7 +60,7 @@ class Coach():
 
             if r!=0:
                 #print(board)
-                return [(x[0],x[2],r*((-1)**(x[1]!=self.curPlayer))) for x in trainExamples]
+                return [(x[0],x[2],1 if x[1] == r else -1) for x in trainExamples]
 
     def learn(self):
         """

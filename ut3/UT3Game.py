@@ -63,8 +63,8 @@ class UT3Game(Game):
             for player in range(1, numPlayers+1):
                 if b.is_win(player, insides[i]):
                     return player
-                if b.is_full():
-                    return b.draw
+            if b.is_full():
+                return b.draw
         return 0
 
     def getCanonicalForm(self, board, player):
