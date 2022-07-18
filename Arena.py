@@ -2,7 +2,7 @@ import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time
 
-numPlayers = 2
+numPlayers = 3
 
 
 class Arena():
@@ -27,13 +27,14 @@ class Arena():
         self.display = display
 
     def getNextPlayer(self, players, player):
-        nextPlayer = players[0]
+        return players[player-1]
+        # nextPlayer = players[0]
 
-        if player >= numPlayers:
-            return nextPlayer
-        else:
-            nextPlayer = players[player]
-            return nextPlayer
+        # if player >= numPlayers:
+        #     return nextPlayer
+        # else:
+        #     nextPlayer = players[player]
+        #     return nextPlayer
 
     def playGame(self, verbose=False):
         """
@@ -95,16 +96,21 @@ class Arena():
 
         draws = 0
         for offset in range(numPlayers):
-
             # plays a set of games
             for _ in range(int(num/numPlayers)):
                 gameResult = self.playGame(verbose=verbose)
+                # print(gameResult)
                 if gameResult < 1 and gameResult > 0:
                     draws += 1
+                    # print("Draw")
                 else:
-                    playerWins[gameResult - offset - 1] += 1
+                    playerWins[(gameResult + offset - 1) %
+                               len(playerWins)] += 1
+                    # print("\n", self.players[gameResult - 1])
 
-                    # bookkeeping + plot progress
+                # print(playerWins)
+
+                # bookkeeping + plot progress
                 eps += 1
                 eps_time.update(time.time() - end)
                 end = time.time()
