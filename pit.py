@@ -35,5 +35,5 @@ def np1(x): return np.argmax(mcts1.getActionProb(x, temp=0))
 
 
 # player order: player 3, player 1, player 2
-arena = Arena.Arena([hp, np1, mp2], g, display=display)
-print(arena.playGames(12, verbose=True))
+arena = Arena.Arena([rp, rp, rp], g, display=display)
+print(arena.playGames(6, verbose=True))
