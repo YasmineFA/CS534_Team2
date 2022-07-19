@@ -1,15 +1,21 @@
+from Arena import numPlayers
+from ut3.UT3Game import display
 import random
 import numpy as np
 import math
 
 EPS = 1e-8
 
-from Arena import numPlayers
 
-
-class RandomPlayer():
+class Player():
     def __init__(self, game):
         self.game = game
+        self.playerNumber = None
+
+
+class RandomPlayer(Player):
+    def __init__(self, game):
+        Player.__init__(self, game)
 
     def play(self, board):
         valid = self.game.getValidMoves(board, 1)
@@ -19,9 +25,9 @@ class RandomPlayer():
                 return a
 
 
-class HumanUT3Player():
+class HumanUT3Player(Player):
     def __init__(self, game):
-        self.game = game
+        Player.__init__(self, game)
 
     def play(self, board):
         valid = self.game.getValidMoves(board, 1)
@@ -39,9 +45,9 @@ class HumanUT3Player():
         return a
 
 
-class MinMaxUT3Player():
+class MinMaxUT3Player(Player):
     def __init__(self, game, depth=2):
-        self.game = game
+        Player.__init__(self, game)
         self.depth = depth
         self.end = {}
         self.valid = {}
@@ -52,24 +58,24 @@ class MinMaxUT3Player():
 
         if key not in self.end:
             self.end[key] = np.empty(numPlayers)
-            
+
             for i in range(numPlayers):
-            	j = i+1
-            	winner = self.game.getGameEnded(board, j)
-            	
-            	if winner == j:
-    	        	self.end[key][i] = winner
-            	elif winner == self.draw:
-                	self.end[key][i] = self.draw
-            	else:
-                	self.end[key][i] = 0
+                j = i+1
+                winner = self.game.getGameEnded(board, j)
+
+                if winner == j:
+                    self.end[key][i] = winner
+                elif winner == self.draw:
+                    self.end[key][i] = self.draw
+                else:
+                    self.end[key][i] = 0
 
         if key not in self.valid:
             self.valid[key] = [a for a, val in enumerate(
                 self.game.getValidMoves(board, 1)) if val]
 
         if any(self.end[key]):
-        
+
             return self.end[key], None
 
         if depth == 0:
@@ -77,12 +83,13 @@ class MinMaxUT3Player():
 
         value_action = []
 
-        active_player = 1
-	
+        active_player = self.playerNumber
+
         for a in self.valid[key]:
-            next_board, next_player = self.game.getNextState(board, active_player, a)
+            next_board, next_player = self.game.getNextState(
+                board, active_player, a)
             next_board = self.game.getCanonicalForm(next_board, next_player)
-            active_player = (active_player%numPlayers)+1
+            active_player = (active_player % numPlayers)+1
             value_action.append((self.search(next_board, depth-1)[0], a))
 
         wins = [(v, a) for v, a in value_action if any(v == active_player)]
@@ -102,156 +109,67 @@ class MinMaxUT3Player():
 
         value, action = random.choice(value_action)
         return value, action
-	
+
     def play(self, board):
         temp = self.search(board, self.depth)
-        #print(temp)
+        # print(temp)
         return temp[1]
-        
-class MCTSUT3Player():
-    """This class handles the MCTS tree."""
 
+
+class MCTSUT3Player(Player):
     def __init__(self, game, args):
-        self.game = game
+        Player.__init__(self, game)
         self.args = args
-        self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
-        self.Nsa = {}       # stores #times edge s,a was visited
-        self.Ns = {}        # stores #times board s was visited
-        self.Ps = {}        # stores initial policy (returned by neural net)
-        self.Es = {}        # stores game.getGameEnded ended for board s
-        self.Vs = {}        # stores game.getValidMoves for board s
-
-    def getActionProb(self, canonicalBoard, temp=1):
-        """
-        This function performs numMCTSSims simulations of MCTS starting from
-        canonicalBoard.
-
-        Returns:
-            probs: a policy vector where the probability of the ith action is
-                   proportional to Nsa[(s,a)]**(1./temp)
-        """
-        for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
-
-        s = self.game.stringRepresentation(canonicalBoard)
-        valids = self.game.getValidMoves(canonicalBoard, 1)
-        counts = [self.Nsa[(s, a)] if (
-            s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
-
-        if temp == 0:
-            bestA = np.argmax(counts)
-            probs = [0]*len(counts)
-            probs[bestA] = 1
-            return probs
-
-        counts = [x**(1./temp) for x in counts]
-        probs = [x/float(sum(counts)) for x in counts]
-        
-        probMat = valids*counts*probs
-        
-        #print(probMat)
-        
-        best_move = max(probMat)
-
-        possible = [a for a, val in enumerate(probMat) if val == best_move]
-
-        return random.choice(possible)
-
-    def search(self, canonicalBoard):
-        """
-        This function performs one iteration of MCTS. It is recursively called
-        till a leaf node is found. The action chosen at each node is one that
-        has the maximum upper confidence bound as in the paper.
-
-        Once a leaf node is found, the neural network is called to return an
-        initial policy P and a value v for the state. This value is propogated
-        up the search path. In case the leaf node is a terminal state, the
-        outcome is propogated up the search path. The values of Ns, Nsa, Qsa are
-        updated.
-
-        NOTE: the return values are the negative of the value of the current
-        state. This is done since v is in [-1,1] and if v is the value of a
-        state for the current player, then its value is -v for the other player.
-
-        Returns:
-            v: the negative of the value of the current canonicalBoard
-        """
-        #canonicalBoard %= (numPlayers)
-        #canonicalBoard %= numPlayers+1
-        s = self.game.stringRepresentation(canonicalBoard)
-        # print(canonicalBoard)
-
-        if s not in self.Es:
-            self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
-        if self.Es[s] != 0:
-            # terminal node
-            return self.Es[s]
-
-        if s not in self.Ps:
-            # leaf node
-
-            valids = self.game.getValidMoves(canonicalBoard, 1)
-            self.Ps[s] = valids/len(valids)
-            v = self.game.getGameEnded(canonicalBoard, 1)
-            # print(valids)
-            # print(canonicalBoard)
-            self.Ps[s] = self.Ps[s]*valids      # masking invalid moves
-            sum_Ps_s = np.sum(self.Ps[s])
-            if sum_Ps_s > 0:
-                self.Ps[s] /= sum_Ps_s    # renormalize
-                # print(canonicalBoard)
-            else:
-                # if all valid moves were masked make all valid moves equally probable
-                print(canonicalBoard)
-                # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
-                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.
-                print("All valid moves were masked, do workaround.")
-                self.Ps[s] = self.Ps[s] + valids
-                self.Ps[s] /= np.sum(self.Ps[s])
-                # print(v)
-
-            self.Vs[s] = valids
-            self.Ns[s] = 0
-
-            return v
-
-        valids = self.Vs[s]
-        cur_best = -float('inf')
-        best_act = -1
-
-        # pick the action with the highest upper confidence bound
-        for a in range(self.game.getActionSize()):
-            if valids[a]:
-                if (s, a) in self.Qsa:
-                    u = self.Qsa[(s, a)] + self.args.cpuct*self.Ps[s][a] * \
-                        math.sqrt(self.Ns[s])/(1+self.Nsa[(s, a)])
-                else:
-                    u = self.args.cpuct * \
-                        self.Ps[s][a]*math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
-
-                if u > cur_best:
-                    cur_best = u
-                    best_act = a
-
-        a = best_act
-        next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
-        next_s = self.game.getCanonicalForm(next_s, next_player)
-
-        v = self.search(next_s)
-
-        if (s, a) in self.Qsa:
-            self.Qsa[(s, a)] = (self.Nsa[(s, a)] *
-                                self.Qsa[(s, a)] + v)/(self.Nsa[(s, a)]+1)
-            self.Nsa[(s, a)] += 1
-
-        else:
-            self.Qsa[(s, a)] = v
-            self.Nsa[(s, a)] = 1
-
-        self.Ns[s] += 1
-        return self.Qsa[(s, a)]
 
     def play(self, board):
-    
-        return self.getActionProb(board)
+        valid = [a for a, val in enumerate(
+            self.game.getValidMoves(board, 1)) if val]
+        move_evaluations = []  # evaluations of each move, parallel to valid
+        for i in range(len(valid)):
+            move = valid[i]
+            # print("TESTING MOVE:", move)
+            move_evaluations.append(self.evaluateAction(board, move))
+            # print("MOVE OUTCOME:", move_evaluations[-1])
 
+        best_move_index = 0
+        best_eval = move_evaluations[0]
+        for i in range(len(valid)):
+            if move_evaluations[i] > best_eval:
+                best_move_index = i
+                best_eval = move_evaluations[i]
+
+        return valid[best_move_index]
+
+    def evaluateAction(self, board, move):
+        # runs the given number of playouts, returns the average value of the playouts
+        resulting_board, next_player = self.game.getNextState(
+            board, self.playerNumber, move)
+        total = 0
+        for _ in range(self.args.numPlayoutsPerMove):
+            total += self.runPlayout(resulting_board, next_player)
+
+        return total/self.args.numPlayoutsPerMove
+
+    def runPlayout(self, board, current_player):
+        # returns 1 for a win, -1 for a loss, and 0 for a draw
+
+        while self.game.getGameEnded(board, 1) == 0:
+            # display(board)
+            move = self.getRandomMove(board)
+            # print("Move made", move)
+            board, current_player = self.game.getNextState(
+                board, current_player, move)
+
+        result = self.game.getGameEnded(board, 1)
+
+        if result > 0 and result < 1:   # draw
+            return 0
+        if result == self.playerNumber:  # win
+            return 1
+        else:                           # loss
+            return -1
+
+    def getRandomMove(self, board):
+        valid = [a for a, val in enumerate(
+            self.game.getValidMoves(board, 1)) if val]
+        return random.choice(valid)

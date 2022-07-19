@@ -1,3 +1,4 @@
+import types
 import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time
@@ -26,6 +27,12 @@ class Arena():
         self.game = game
         self.display = display
 
+        for i in range(len(players)):
+
+            # if it is a method of a class
+            if (isinstance(players[i], types.MethodType)):
+                players[i].__self__.playerNumber = (i + 1)
+
     def playGame(self, verbose=False):
         """
         Executes one episode of a game.
@@ -46,8 +53,8 @@ class Arena():
             it += 1
             if verbose:
                 assert(self.display)
-                #print("Turn ", str(it), "Player ", str(curPlayer))
-                # self.display(board)
+                print("Turn ", str(it), "Player ", str(curPlayer))
+                self.display(board)
 
             action = players[curPlayer-1](
                 self.game.getCanonicalForm(board, curPlayer))
