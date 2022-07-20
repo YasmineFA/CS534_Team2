@@ -26,6 +26,8 @@ class Arena():
         self.players = players
         self.game = game
         self.display = display
+        self.total_turns = 0
+        self.total_games = 0
 
         for i in range(len(players)):
 
@@ -53,8 +55,8 @@ class Arena():
             it += 1
             if verbose:
                 assert(self.display)
-                print("Turn ", str(it), "Player ", str(curPlayer))
-                self.display(board)
+                # print("Turn ", str(it), "Player ", str(curPlayer))
+                # self.display(board)
 
             action = players[curPlayer-1](
                 self.game.getCanonicalForm(board, curPlayer))
@@ -66,6 +68,9 @@ class Arena():
                 print(action)
                 assert valids[action] > 0
             board, curPlayer = self.game.getNextState(board, curPlayer, action)
+
+        self.total_turns += it
+        self.total_games += 1
         if verbose:
             assert(self.display)
             print("Game over: Turn ", str(it), "Result ",
@@ -113,7 +118,7 @@ class Arena():
             bar.next()
 
         self.players[0], self.players[1] = self.players[1], self.players[0]
-        #self.assignPositions(self.players)
+        # self.assignPositions(self.players)
 
         for _ in range(num):
             gameResult = self.playGame(verbose=verbose)
@@ -181,5 +186,8 @@ class Arena():
             #     bar.next()
 
         bar.finish()
+
+        print("Average number of turns:", str(
+            self.total_turns/self.total_games))
 
         return playerWins, draws
